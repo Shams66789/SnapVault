@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,8 +6,13 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
-
+import auth from '@react-native-firebase/auth';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 import DefaultImage from '../assets/download.png';
 import DefaultImage1 from '../assets/google-png.png';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -15,23 +20,64 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 const DEFAULT_IMAGE = Image.resolveAssetSource(DefaultImage).uri;
 const DEFAULT_IMAGE1 = Image.resolveAssetSource(DefaultImage1).uri;
 
-const UserSetUp = () => {
+const UserSetUp = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [activeForm, setActiveForm] = useState('signIn');
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: process.env.GOOGLE_WEB_CLIENT_ID, // Replace with your web client ID
+    });
+  }, []);
+
   const handleLogin = () => {
-    // Handle login logic here
-    console.log('Email:', email);
-    console.log('Password:', password);
+    if (email === '' || password === '') {
+      Alert.alert('Error', 'Email and password are required.');
+      return;
+    }
+
+    auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(() => {
+        console.log('User signed in!');
+        navigation.navigate('Home');
+      })
+      .catch(error => {
+        if (error.code === 'auth/user-not-found') {
+          Alert.alert('Error', 'No user found with this email.');
+        } else {
+          Alert.alert('Error', error.message);
+        }
+      });
   };
 
   const handleSignUp = () => {
-    // Handle sign up logic here
-    console.log('Email:', email);
-    console.log('Password:', password);
+    if (email === '' || password === '' || confirmPassword === '') {
+      Alert.alert('Error', 'All fields are required.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match.');
+      return;
+    }
+
+    auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        console.log('User account created & signed in!');
+        navigation.navigate('Home');
+      })
+      .catch(error => {
+        if (error.code === 'auth/email-already-in-use') {
+          Alert.alert('Error', 'This email address is already in use!');
+        } else {
+          Alert.alert('Error', error.message);
+        }
+      });
   };
 
   const togglePasswordVisibility = () => {
@@ -43,6 +89,51 @@ const UserSetUp = () => {
     setEmail('');
     setPassword('');
     setConfirmPassword('');
+  };
+
+  const handlePasswordReset = () => {
+    if (email === '') {
+      Alert.alert('Error', 'Please enter your email to reset password.');
+      return;
+    }
+
+    auth()
+      .sendPasswordResetEmail(email)
+      .then(() => {
+        Alert.alert('Success', 'Password reset email sent!');
+      })
+      .catch(error => {
+        Alert.alert('Error', error.message);
+      });
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      const googleCredential = auth.GoogleAuthProvider.credential(
+        userInfo.idToken,
+      );
+      auth()
+        .signInWithCredential(googleCredential)
+        .then(() => {
+          console.log('User signed in with Google!');
+          navigation.navigate('Home');
+        })
+        .catch(error => {
+          Alert.alert('Error', error.message);
+        });
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        Alert.alert('Error', 'User cancelled the login process');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        Alert.alert('Error', 'Sign in is in progress');
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        Alert.alert('Error', 'Play services not available or outdated');
+      } else {
+        Alert.alert('Error', error.message);
+      }
+    }
   };
 
   return (
@@ -101,13 +192,23 @@ const UserSetUp = () => {
                 />
               </TouchableOpacity>
             </View>
+
+            <Text style={styles.forgetText} onPress={handlePasswordReset}>
+              Forget Password?
+            </Text>
+
             <TouchableOpacity style={styles.submitButton} onPress={handleLogin}>
               <Text style={styles.submitButtonText}>Login</Text>
             </TouchableOpacity>
 
             <Text style={styles.oRText}>-OR-</Text>
 
-            <Image source={{uri: DEFAULT_IMAGE1}} style={styles.googleButton} />
+            <TouchableOpacity onPress={handleGoogleSignIn}>
+              <Image
+                source={{uri: DEFAULT_IMAGE1}}
+                style={styles.googleButton}
+              />
+            </TouchableOpacity>
           </View>
         ) : (
           <View>
@@ -143,7 +244,7 @@ const UserSetUp = () => {
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.input}
-                placeholder="Confirm Password" 
+                placeholder="Confirm Password"
                 placeholderTextColor={'#000'}
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
@@ -168,7 +269,12 @@ const UserSetUp = () => {
 
             <Text style={styles.oRText}>-OR-</Text>
 
-            <Image source={{uri: DEFAULT_IMAGE1}} style={styles.googleButton} />
+            <TouchableOpacity onPress={handleGoogleSignIn}>
+              <Image
+                source={{uri: DEFAULT_IMAGE1}}
+                style={styles.googleButton}
+              />
+            </TouchableOpacity>
           </View>
         )}
       </View>
@@ -181,10 +287,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#000', // Light mode background color
+    backgroundColor: '#000',
   },
   text: {
-    color: '#fff', // Light mode text color
+    color: '#fff',
     fontSize: 28,
     fontFamily: 'inter_medium',
   },
@@ -211,7 +317,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#f45b69', // Red color
+    backgroundColor: '#f45b69',
     padding: 10,
     borderRadius: 10,
     margin: 10,
@@ -219,7 +325,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   activeButton: {
-    backgroundColor: '#d43d4e', // Darker red for active button
+    backgroundColor: '#d43d4e',
   },
   buttonText: {
     color: '#fff',
@@ -233,10 +339,9 @@ const styles = StyleSheet.create({
     height: 55,
     fontFamily: 'inter_regular',
     padding: 10,
-    borderColor: '#000', // Set the border color here
+    borderColor: '#000',
     borderWidth: 1,
     borderRadius: 10,
-
     marginBottom: 15,
     width: '100%',
   },
@@ -254,26 +359,29 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     alignItems: 'center',
-    marginBottom: 10,
   },
   submitButtonText: {
     color: '#fff',
     fontSize: 17,
     fontFamily: 'inter_semi_bold',
   },
+  forgetText: {
+    textAlign: 'right',
+    color: '#000',
+    fontFamily: 'inter_medium',
+    marginBottom: 15,
+  },
   oRText: {
     color: '#000',
-    fontSize: 18,
-    marginBottom: 20,
+    textAlign: 'center',
     fontFamily: 'inter_semi_bold',
-    textAlign: 'center', // Add this line to center the text horizontally
-    width: '100%', // Make sure it takes the full width of the container
+    marginVertical: 10,
   },
   googleButton: {
-    alignSelf: 'center',
     width: 40,
     height: 40,
     resizeMode: 'contain',
+    alignSelf: 'center',
   },
 });
 

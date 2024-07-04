@@ -3,6 +3,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack'
 import React, { Component, useEffect } from 'react';
 import SplashScreen from 'react-native-splash-screen';
 import UserSetUp from './components/UserSetUp';
+import Home from './components/Home';
 
 
 const Stack = createNativeStackNavigator();
@@ -25,7 +26,14 @@ function App(): React.JSX.Element {
         <Stack.Screen
           name="User Setup"
           component={UserSetUp}
-          options = {{
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{
             headerShown: false,
           }}
         />
