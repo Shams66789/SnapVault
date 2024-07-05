@@ -78,7 +78,7 @@ const UserSetUp = ({navigation}) => {
       .createUserWithEmailAndPassword(email, password)
       .then(() => {
         console.log('User account created & signed in!');
-        navigation.navigate('Home');
+        navigation.navigate('UserProfileImg');
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {

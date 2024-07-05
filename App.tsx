@@ -25,6 +25,13 @@ function App(): React.JSX.Element {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
+          name="UserProfileImg"
+          component={UserProfileImg}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="User Setup"
           component={UserSetUp}
           options={{
@@ -34,14 +41,6 @@ function App(): React.JSX.Element {
         <Stack.Screen
           name="Home"
           component={Home}
-          options={{
-            headerShown: false,
-          }}
-        />
-
-        <Stack.Screen
-          name="UserProfileImg"
-          component={UserProfileImg}
           options={{
             headerShown: false,
           }}
