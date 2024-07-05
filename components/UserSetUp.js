@@ -16,6 +16,7 @@ import {
 import DefaultImage from '../assets/download.png';
 import DefaultImage1 from '../assets/google-png.png';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import LoadingOverlay from './LoadingOverlay'; // Adjust the path as per your file structure
 
 const DEFAULT_IMAGE = Image.resolveAssetSource(DefaultImage).uri;
 const DEFAULT_IMAGE1 = Image.resolveAssetSource(DefaultImage1).uri;
@@ -26,16 +27,20 @@ const UserSetUp = ({navigation}) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [activeForm, setActiveForm] = useState('signIn');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: process.env.GOOGLE_WEB_CLIENT_ID, // Replace with your web client ID
+      webClientId:
+        '167512415573-nl06dssniuto786f2cvdh1cviu9218ag.apps.googleusercontent.com',
     });
   }, []);
 
   const handleLogin = () => {
+    setLoading(true);
     if (email === '' || password === '') {
       Alert.alert('Error', 'Email and password are required.');
+      setLoading(false);
       return;
     }
 
@@ -51,17 +56,21 @@ const UserSetUp = ({navigation}) => {
         } else {
           Alert.alert('Error', error.message);
         }
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   const handleSignUp = () => {
+    setLoading(true);
     if (email === '' || password === '' || confirmPassword === '') {
       Alert.alert('Error', 'All fields are required.');
+      setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match.');
+      setLoading(false);
       return;
     }
 
@@ -77,7 +86,8 @@ const UserSetUp = ({navigation}) => {
         } else {
           Alert.alert('Error', error.message);
         }
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   const togglePasswordVisibility = () => {
@@ -92,8 +102,10 @@ const UserSetUp = ({navigation}) => {
   };
 
   const handlePasswordReset = () => {
+    setLoading(true);
     if (email === '') {
       Alert.alert('Error', 'Please enter your email to reset password.');
+      setLoading(false);
       return;
     }
 
@@ -104,25 +116,42 @@ const UserSetUp = ({navigation}) => {
       })
       .catch(error => {
         Alert.alert('Error', error.message);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   const handleGoogleSignIn = async () => {
+    setLoading(true);
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      const googleCredential = auth.GoogleAuthProvider.credential(
-        userInfo.idToken,
-      );
+      const {idToken} = userInfo;
+      
+
+      if (!idToken) {
+        Alert.alert('Error', 'Failed to get idToken from Google Sign-In');
+        setLoading(false);
+        return;
+      }
+
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
       auth()
         .signInWithCredential(googleCredential)
-        .then(() => {
-          console.log('User signed in with Google!');
-          navigation.navigate('Home');
+        .then(async userCredential => {
+          // Check if the user is new or existing
+          const isNewUser = userCredential.additionalUserInfo?.isNewUser;
+
+          if (isNewUser) {
+            navigation.navigate('UserProfileImg', {user: userCredential.user});
+          } else {
+            navigation.navigate('Home');
+          }
         })
         .catch(error => {
           Alert.alert('Error', error.message);
-        });
+        })
+        .finally(() => setLoading(false));
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         Alert.alert('Error', 'User cancelled the login process');
@@ -133,6 +162,7 @@ const UserSetUp = ({navigation}) => {
       } else {
         Alert.alert('Error', error.message);
       }
+      setLoading(false);
     }
   };
 
@@ -278,6 +308,8 @@ const UserSetUp = ({navigation}) => {
           </View>
         )}
       </View>
+
+      <LoadingOverlay visible={loading} />
     </View>
   );
 };

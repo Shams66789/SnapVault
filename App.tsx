@@ -4,6 +4,7 @@ import React, { Component, useEffect } from 'react';
 import SplashScreen from 'react-native-splash-screen';
 import UserSetUp from './components/UserSetUp';
 import Home from './components/Home';
+import UserProfileImg from './components/UserProfileImg';
 
 
 const Stack = createNativeStackNavigator();
@@ -33,6 +34,14 @@ function App(): React.JSX.Element {
         <Stack.Screen
           name="Home"
           component={Home}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="UserProfileImg"
+          component={UserProfileImg}
           options={{
             headerShown: false,
           }}

@@ -109,6 +109,10 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation project(':react-native-splash-screen')
 
+    implementation platform('com.google.firebase:firebase-bom:33.1.1') // Use the latest bom version
+    implementation ('com.google.firebase:firebase-auth')
+    implementation ('com.google.android.gms:play-services-auth:21.2.0')
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
