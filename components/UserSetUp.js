@@ -76,9 +76,9 @@ const UserSetUp = ({navigation}) => {
 
     auth()
       .createUserWithEmailAndPassword(email, password)
-      .then(() => {
+      .then(userCredential => {
         console.log('User account created & signed in!');
-        navigation.navigate('UserProfileImg');
+        navigation.navigate('UserProfileImg', {user: userCredential.user});
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
@@ -126,7 +126,6 @@ const UserSetUp = ({navigation}) => {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       const {idToken} = userInfo;
-      
 
       if (!idToken) {
         Alert.alert('Error', 'Failed to get idToken from Google Sign-In');
@@ -139,7 +138,6 @@ const UserSetUp = ({navigation}) => {
       auth()
         .signInWithCredential(googleCredential)
         .then(async userCredential => {
-          // Check if the user is new or existing
           const isNewUser = userCredential.additionalUserInfo?.isNewUser;
 
           if (isNewUser) {

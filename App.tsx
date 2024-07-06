@@ -25,15 +25,15 @@ function App(): React.JSX.Element {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
-          name="UserProfileImg"
-          component={UserProfileImg}
+          name="User Setup"
+          component={UserSetUp}
           options={{
             headerShown: false,
           }}
         />
         <Stack.Screen
-          name="User Setup"
-          component={UserSetUp}
+          name="UserProfileImg"
+          component={UserProfileImg}
           options={{
             headerShown: false,
           }}

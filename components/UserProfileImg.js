@@ -1,66 +1,102 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useState } from 'react';
+import React, {useState} from 'react';
+import {
+  View,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Text,
+  Alert,
+  BackHandler,
+} from 'react-native';
+import ImagePicker from 'react-native-image-crop-picker';
+import {useFocusEffect} from '@react-navigation/native';
+import LoadingOverlay from './LoadingOverlay'; // Assuming LoadingOverlay is defined correctly
+import storage from '@react-native-firebase/storage';
+import auth from '@react-native-firebase/auth';
 import DefaultImage from '../assets/student.png';
 
 const DEFAULT_IMAGE = Image.resolveAssetSource(DefaultImage).uri;
 
-const UserProfileImg = () => {
+const UserProfileImg = ({navigation, route}) => {
+  const [imageUri, setImageUri] = useState(DEFAULT_IMAGE);
+  const [loading, setLoading] = useState(false);
+  const {user} = route.params || {};
 
-  const [profileImage, setProfileImage] = useState(DEFAULT_IMAGE);
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        BackHandler.exitApp();
+        return true;
+      };
 
-  const handleChoosePhoto = () => {
-    const options = {
-      noData: true,
-    };
-    ImagePicker.launchImageLibrary(options, response => {
-      if (response.uri) {
-        setProfileImage(response.uri);
-      }
-    });
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
+
+  const handleSelectImage = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 300,
+      cropping: true,
+    })
+      .then(image => {
+        setImageUri(image.path);
+      })
+      .catch(error => {
+        if (error.code !== 'E_PICKER_CANCELLED') {
+          console.log('ImagePicker Error: ', error.message);
+        }
+      });
   };
 
   const handleNext = async () => {
+    if (!user) {
+      Alert.alert('Error', 'User information is missing.');
+      return;
+    }
+
+    setLoading(true);
+    const uploadUri = imageUri === DEFAULT_IMAGE ? null : imageUri;
+    const imageRef = storage().ref(`profilePictures/${user.uid}.jpg`);
+
     try {
-      const imageUri = profileImage === DEFAULT_IMAGE ? null : profileImage;
-      // Upload image to Firebase Storage if not default
-      if (imageUri) {
-        const uploadUri = imageUri;
-        const filename = uploadUri.substring(uploadUri.lastIndexOf('/') + 1);
-        const storageRef = storage().ref(`profile/${filename}`);
-        await storageRef.putFile(uploadUri);
-        const imageUrl = await storageRef.getDownloadURL();
-        console.log('Uploaded image URL:', imageUrl);
-        // Navigate to next screen or handle next action
+      if (uploadUri) {
+        await imageRef.putFile(uploadUri);
       } else {
-        // Handle case where default image is used
-        console.log('Using default image');
-        // Navigate to next screen or handle next action
+        await imageRef.putString(DEFAULT_IMAGE, 'data_url');
       }
+
+      const imageUrl = await imageRef.getDownloadURL();
+      await auth().currentUser.updateProfile({photoURL: imageUrl});
+
+      console.log('Profile image uploaded and URL set!');
+      navigation.navigate('Home');
     } catch (error) {
-      console.error('Error uploading image:', error.message);
-      Alert.alert('Error', 'Failed to upload image.');
+      console.error('Error uploading profile image: ', error);
+      Alert.alert('Error', 'Failed to upload profile image.');
+    } finally {
+      setLoading(false);
     }
   };
 
-
-    return (
-      <View style={styles.container}>
-        <View style={styles.containerImg}>
-          <Image source={{uri: DEFAULT_IMAGE}} style={styles.image} />
-        </View>
-
-        <TouchableOpacity
-          style={styles.AddImgButton}
-          onPress={handleChoosePhoto}>
-          <Text style={styles.AddImgButtonText}>Add profile photo</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.AddImgButtonText}>Next</Text>
-        </TouchableOpacity>
+  return (
+    <View style={styles.container}>
+      {loading && <LoadingOverlay />}
+      <View style={styles.containerImg}>
+        <Image source={{uri: imageUri}} style={styles.image} />
       </View>
-    );
-}
+      <TouchableOpacity style={styles.AddImgButton} onPress={handleSelectImage}>
+        <Text style={styles.AddImgButtonText}>Add profile photo</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+        <Text style={styles.NextButtonText}>Next</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -79,7 +115,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   image: {
-    // backgroundColor: '#fff',
     width: 200,
     height: 200,
     resizeMode: 'contain',
@@ -104,6 +139,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 20,
     alignItems: 'center',
+  },
+  NextButtonText: {
+    color: '#fff',
+    fontSize: 17,
+    fontFamily: 'inter_semi_bold',
   },
 });
 
