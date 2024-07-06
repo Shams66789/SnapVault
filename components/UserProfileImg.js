@@ -73,7 +73,7 @@ const UserProfileImg = ({navigation, route}) => {
       await auth().currentUser.updateProfile({photoURL: imageUrl});
 
       console.log('Profile image uploaded and URL set!');
-      navigation.navigate('Home');
+      navigation.navigate('UserInfo');
     } catch (error) {
       console.error('Error uploading profile image: ', error);
       Alert.alert('Error', 'Failed to upload profile image.');
