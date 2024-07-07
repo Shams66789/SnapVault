@@ -6,6 +6,7 @@ import UserSetUp from './components/UserSetUp';
 import Home from './components/Home';
 import UserProfileImg from './components/UserProfileImg';
 import UserInfo from './components/UserInfo';
+import settings from './components/settings';
 
 
 const Stack = createNativeStackNavigator();
@@ -49,6 +50,13 @@ function App(): React.JSX.Element {
         <Stack.Screen
           name="Home"
           component={Home}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="settings"
+          component={settings}
           options={{
             headerShown: false,
           }}
