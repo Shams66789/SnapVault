@@ -6,7 +6,7 @@ import UserSetUp from './components/UserSetUp';
 import Home from './components/Home';
 import UserProfileImg from './components/UserProfileImg';
 import UserInfo from './components/UserInfo';
-import settings from './components/settings';
+import Settings from './components/Settings';
 
 
 const Stack = createNativeStackNavigator();
@@ -27,7 +27,7 @@ function App(): React.JSX.Element {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
-          name="User Setup"
+          name="UserSetUp"
           component={UserSetUp}
           options={{
             headerShown: false,
@@ -55,8 +55,8 @@ function App(): React.JSX.Element {
           }}
         />
         <Stack.Screen
-          name="settings"
-          component={settings}
+          name="Settings"
+          component={Settings}
           options={{
             headerShown: false,
           }}

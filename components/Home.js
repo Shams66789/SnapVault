@@ -140,9 +140,6 @@ const Home = () => {
     }
   };
 
-  const navigateToSettings = () => {
-    navigation.navigate('Settings');
-  };
 
   const refreshScreen = () => {
     setLoading(true); // Simulate refresh by setting loading state
@@ -188,7 +185,7 @@ const Home = () => {
         actions={actions}
         onPressItem={name => {
           if (name === 'bt_settings') {
-            navigation.navigate('settings');
+            navigation.navigate('Settings');
           } else if (name === 'bt_home') {
             refreshScreen();
           }
