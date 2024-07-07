@@ -9,7 +9,7 @@ const LoadingOverlay = ({visible}) => (
     statusBarTranslucent>
     <View style={styles.container}>
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#d43d4e" />
+        <ActivityIndicator size="large" color="#F2D7D5" />
       </View>
     </View>
   </Modal>

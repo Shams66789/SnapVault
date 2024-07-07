@@ -92,8 +92,8 @@ const UserInfo = () => {
         onChangeText={text => setName(text)}
       />
       <View style={styles.rowDatePicker}>
-        <Text style={[styles.label, {marginRight: 20, marginTop: 12}]}>
-          Select your DOB 👉:
+        <Text style={[styles.label, {marginRight: 20, marginTop: 20}]}>
+          Select your DOB 👉 :
         </Text>
 
         <Icon name="calendar" size={22} color="#fff" onPress={showDatepicker} />
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '80%',
-    backgroundColor: '#fff',
+    backgroundColor: '#EEE9E9',
     padding: 10,
     marginBottom: 30,
     borderRadius: 5,

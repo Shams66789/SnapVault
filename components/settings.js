@@ -3,6 +3,7 @@ import {
   Alert,
   BackHandler,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -114,28 +115,30 @@ const Settings = () => {
         <Image source={{uri: profileImage}} style={styles.profileImage} />
         <Text style={styles.userName}>{name}</Text>
       </View>
-      <View style={styles.centerContainer}>
-        <View style={styles.containerImg}>
-          <Image source={{uri: profileImage}} style={styles.image} />
+      <ScrollView>
+        <View style={styles.centerContainer}>
+          <View style={styles.containerImg}>
+            <Image source={{uri: profileImage}} style={styles.image} />
+          </View>
+          <TouchableOpacity style={styles.editButton} onPress={handleEditImage}>
+            <Icon name="edit" size={28} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.label}>Enter your Name:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Type your name..."
+            placeholderTextColor={'#000'}
+            value={name}
+            onChangeText={text => setName(text)}
+          />
+          <TouchableOpacity style={styles.saveButton} onPress={saveChanges}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.logOutButton} onPress={logout}>
+            <Text style={styles.logoutButtonText}>Log Out</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.editButton} onPress={handleEditImage}>
-          <Icon name="edit" size={28} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.label}>Enter your Name:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Type your name..."
-          placeholderTextColor={'#000'}
-          value={name}
-          onChangeText={text => setName(text)}
-        />
-        <TouchableOpacity style={styles.saveButton} onPress={saveChanges}>
-          <Text style={styles.saveButtonText}>Save</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.logOutButton} onPress={logout}>
-          <Text style={styles.logoutButtonText}>Log Out</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -167,6 +170,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
+    marginTop: 20,
   },
   containerImg: {
     width: 200,
@@ -175,7 +179,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#fff',
     overflow: 'hidden',
-    marginBottom: 40,
+    marginBottom: 50,
   },
   image: {
     width: 200,
@@ -190,10 +194,10 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '80%',
-    backgroundColor: '#fff',
+    backgroundColor: '#EEE9E9',
     padding: 10,
     marginBottom: 30,
-    borderRadius: 5,
+    borderRadius: 10,
     fontSize: 16,
     color: '#000',
     fontFamily: 'inter_regular',
@@ -226,7 +230,7 @@ const styles = StyleSheet.create({
   },
   editButton: {
     position: 'absolute',
-    top: 210,
+    top: 160,
     right: 100,
     backgroundColor: '#f45b69',
     padding: 10,

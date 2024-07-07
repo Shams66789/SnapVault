@@ -47,8 +47,10 @@ const UserSetUp = ({navigation}) => {
     auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => {
-        console.log('User signed in!');
+        // console.log('User signed in!');
         navigation.navigate('Home');
+        setEmail(''); // Clear email input
+        setPassword(''); // Clear password input
       })
       .catch(error => {
         if (error.code === 'auth/user-not-found') {
@@ -77,8 +79,11 @@ const UserSetUp = ({navigation}) => {
     auth()
       .createUserWithEmailAndPassword(email, password)
       .then(userCredential => {
-        console.log('User account created & signed in!');
+        // console.log('User account created & signed in!');
         navigation.navigate('UserProfileImg', {user: userCredential.user});
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
@@ -339,7 +344,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     marginTop: 15,
-    width: '80%',
+    width: '95%',
   },
   buttonContainer: {
     flexDirection: 'row',

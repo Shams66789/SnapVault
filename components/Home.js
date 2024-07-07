@@ -17,8 +17,8 @@ import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import LoadingOverlay from './LoadingOverlay';
 import ImagePicker from 'react-native-image-crop-picker';
-import Swiper from 'react-native-swiper';
 import {useNavigation} from '@react-navigation/native';
+import CustomCarousel from './CustomCarousel';
 
 const DEFAULT_IMAGE = Image.resolveAssetSource(DefaultImage).uri;
 const {width} = Dimensions.get('window');
@@ -44,6 +44,7 @@ const Home = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [icon, setIcon] = useState('bars');
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const fetchUserDetails = async () => {
     const currentUser = auth().currentUser;
@@ -105,6 +106,15 @@ const Home = () => {
     fetchImages();
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchUserDetails();
+      fetchImages();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
   const handleOpen = () => {
     setIcon('times');
   };
@@ -116,8 +126,6 @@ const Home = () => {
   const pickImage = async () => {
     try {
       const image = await ImagePicker.openPicker({
-        width: 200,
-        height: 200,
         cropping: true,
       });
 
@@ -161,18 +169,7 @@ const Home = () => {
         ) : images.length === 0 ? (
           <Text style={styles.uploadText}>Upload your story</Text>
         ) : (
-          <Swiper
-            loop={false}
-            showsPagination={true}
-            style={styles.wrapper}
-            dotStyle={styles.dot}
-            activeDotStyle={styles.activeDot}>
-            {images.map((image, index) => (
-              <View key={index} style={styles.slide}>
-                <Image source={{uri: image}} style={styles.carouselImage} />
-              </View>
-            ))}
-          </Swiper>
+          <CustomCarousel images={images} />
         )}
       </View>
       <TouchableOpacity style={styles.footerButton} onPress={pickImage}>
@@ -240,17 +237,6 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  carouselImage: {
-    width: '80%',
-    height: '70%',
-    borderRadius: 10,
-  },
-  wrapper: {},
-  slide: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
