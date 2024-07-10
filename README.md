@@ -15,11 +15,11 @@ SnapVault is a React Native application designed for storing and managing photos
 <!-- Add screenshots of your app here -->
 <img src="ScreenShots/SplashScreen.jpg" alt="Screenshot 1" width="200"/> <img src="ScreenShots/SignIn.jpg" alt="Screenshot 2" width="200"/><img src="ScreenShots/SignUp.jpg" alt="Screenshot 3" width="200"/>
  <img src="ScreenShots/AddProfilePic.jpg" alt="Screenshot 4" width="200"/> <img src="ScreenShots/AddProfileDetails.jpg" alt="Screenshot 5" width="200"/> <img src="ScreenShots/HomeEmpty.jpg" alt="Screenshot 6" width="200"/> <img src="ScreenShots/Home.jpg" alt="Screenshot 7" width="200"/> 
- <img src="ScreenShots/HomeFloating.jpg" alt="Screenshot 8" width="200"/> <img src="ScreenShots/Settings.jpg.jpg" alt="Screenshot 9" width="200"/>
+ <img src="ScreenShots/HomeFloating.jpg" alt="Screenshot 8" width="200"/> <img src="ScreenShots/Settings.jpg" alt="Screenshot 9" width="200"/>
 
 ## APK Download
 
-Download the latest version of SnapVault APK [here](#).
+Download the latest version of SnapVault APK [here](https://github.com/Shams66789/Twigyy_Assignment/raw/main/APK/SnapVault.apk).
 
 ## Permissions
 
